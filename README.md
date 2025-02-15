@@ -41,7 +41,7 @@ Once installed, run the game with the `-dataex` command-line arg, followed by a 
 | `sfx` |
 | `skills` | Skills and their talents.
 | `souls` |
-| `spiteAssets` |
+| `spriteAssets` |
 | `text` |
 | `tiles` | `TileType`s, `Tileset`s and their properties/map colors.
 | `upgradeCosts` |
