@@ -21,9 +21,9 @@ namespace DataExtractor.Extractors {
 				return new {
 					Id = (int) achievement,
 					InternalName = internalName,
-					DisplayName = Utils.GetText("Achievements/" + internalName),
-					LockedDescription = Utils.GetText("AchievementsLockedDescription/" + internalName),
-					UnlockedDescription = Utils.GetText("AchievementsUnlockedDescription/" + internalName),
+					DisplayName = Utils.GetTranslations("Achievements/" + internalName),
+					LockedDescription = Utils.GetTranslations("AchievementsLockedDescription/" + internalName),
+					UnlockedDescription = Utils.GetTranslations("AchievementsUnlockedDescription/" + internalName),
 					Identifiers = data != null
 						? new {
 							Steam = data.SteamID,

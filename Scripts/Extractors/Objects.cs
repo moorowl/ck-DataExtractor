@@ -98,8 +98,8 @@ namespace DataExtractor.Extractors {
 						AuthoringPrefabName = data.Prefab.name,
 						GraphicalPrefabName = objectInfo.prefabInfos[0].prefab?.name,
 						Variation = objectData.variation,
-						DisplayName = Utils.GetObjectName(objectData.objectID, objectData.variation),
-						Description = Utils.GetObjectDescription(objectData.objectID, objectData.variation),
+						DisplayName = Utils.GetObjectNames(objectData.objectID, objectData.variation),
+						Description = Utils.GetObjectDescriptions(objectData.objectID, objectData.variation),
 						ObjectInfo = serializedObjectInfo,
 						Components = serializedComponents,
 						Upgrades = upgradedComponents.Count > 0 ? upgradedComponents : null

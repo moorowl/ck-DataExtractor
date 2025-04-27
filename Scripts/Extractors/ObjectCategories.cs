@@ -16,7 +16,7 @@ namespace DataExtractor.Extractors {
 				return new {
 					Category = GetCategoryName(info),
 					ParentCategory = GetParentCategoryName(info),
-					DisplayName = Utils.GetText("ItemCategory/" + info.name),
+					DisplayName = Utils.GetTranslations("ItemCategory/" + info.name),
 					Icon = info.icon?.name,
 					Objects = isParentCategory ? null : info.ObjectIds // Parents have all the objects of their children
 				};

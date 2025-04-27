@@ -14,8 +14,8 @@ namespace DataExtractor.Extractors {
 				.Select(contentBundle => new {
 					Id = (int) contentBundle.id,
 					InternalName = contentBundle.id,
-					DisplayName = Utils.GetText($"Menu/ContentBundle{contentBundle.id}Title"),
-					Description = Utils.GetText($"Menu/ContentBundle{contentBundle.id}Desc"),
+					DisplayName = Utils.GetTranslations($"Menu/ContentBundle{contentBundle.id}Title"),
+					Description = Utils.GetTranslations($"Menu/ContentBundle{contentBundle.id}Desc"),
 					CanBeActivatedByPlayer = contentBundle.canBeActivatedByPlayer,
 					Dependencies = contentBundle.dependencies
 				});

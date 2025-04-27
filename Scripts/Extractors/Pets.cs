@@ -17,9 +17,9 @@ namespace DataExtractor.Extractors {
 						Id = (int) id,
 						InternalName = id,
 						DisplayName = new {
-							Melee = Utils.GetText($"PetTalents/{id}Melee"),
-							Range = Utils.GetText($"PetTalents/{id}Range"),
-							Buff = Utils.GetText($"PetTalents/{id}Buff")
+							Melee = Utils.GetTranslations($"PetTalents/{id}Melee"),
+							Range = Utils.GetTranslations($"PetTalents/{id}Range"),
+							Buff = Utils.GetTranslations($"PetTalents/{id}Buff")
 						},
 						Icon = new {
 							Melee = info.meleeIcon?.name,

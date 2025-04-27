@@ -3,6 +3,7 @@ using DataExtractor.Utilities;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using I2.Loc;
 
 namespace DataExtractor.Extractors {
 	public class Cooking : Extractor {
@@ -16,7 +17,8 @@ namespace DataExtractor.Extractors {
 				.ToDictionary(x => x.ObjectInfo.objectID, x => x);
 
 			var allIngredientTypes = objects.Values.Where(x => x.HasComponent<CookingIngredientAuthoring>())
-				.Select(x => x.ObjectInfo.objectID);
+				.Select(x => x.ObjectInfo.objectID)
+				.ToList();
 			var allUniqueMeals = new Dictionary<int, Meal>();
 
 			foreach (var ingredientA in allIngredientTypes) {
@@ -46,40 +48,55 @@ namespace DataExtractor.Extractors {
 		public ObjectID FoodItem { get; set; }
 		public int Variation { get; set; }
 
-		public string DisplayName {
+		public Dictionary<string, string> DisplayName {
 			get {
-				var rarityKey = BaseRarity switch {
-					Rarity.Rare => "Rarity/Rare",
-					Rarity.Epic => "Rarity/Epic",
-					_ => ""
-				};
-
-				var nameKey = Utils.GetObjectDisplayTerm(FoodItem, 0);
-				var primaryIngredientKey =
-					PlayerController.GetAnyObjectIDReplaceForNameAndDesc(PrimaryIngredient).ToString();
-				var secondaryIngredientKey =
-					PlayerController.GetAnyObjectIDReplaceForNameAndDesc(SecondaryIngredient).ToString();
-
-				if (primaryIngredientKey.EndsWith("Rare"))
-					primaryIngredientKey = primaryIngredientKey.Remove(primaryIngredientKey.Length - 4, 4);
-				if (secondaryIngredientKey.EndsWith("Rare"))
-					secondaryIngredientKey = secondaryIngredientKey.Remove(secondaryIngredientKey.Length - 4, 4);
-				if (nameKey.EndsWith("Rare") || nameKey.EndsWith("Epic"))
-					nameKey = nameKey.Remove(nameKey.Length - 4, 4);
-
-				var name = string.Format(Utils.GetText("foodFormat"),
-					Utils.GetText("FoodAdjectives/" + secondaryIngredientKey),
-					Utils.GetText("FoodNouns/" + primaryIngredientKey),
-					Utils.GetText("Items/" + nameKey)
-				);
-
-				if (!string.IsNullOrEmpty(rarityKey))
-					name = string.Format(Utils.GetText("rareItemFormat"), Utils.GetText(rarityKey), name);
-
-				return name;
+				var names = LocalizationManager.GetAllLanguages()
+					.Select(language => (LocalizationManager.GetLanguageCode(language), GetDisplayName(language)))
+					.Where(tuple => tuple.Item2 != null)
+					.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+			
+				return names.Any() ? names : null;
 			}
 		}
 
 		public Rarity BaseRarity { get; set; }
+
+		private string GetDisplayName(string language) {
+			var rarityKey = BaseRarity switch {
+				Rarity.Rare => "Rarity/Rare",
+				Rarity.Epic => "Rarity/Epic",
+				_ => ""
+			};
+			
+			var gender = PugDatabase.GetObjectInfo(FoodItem).GetLanguageGender(language);
+			if (gender == Gender.Female)
+				rarityKey += "Female";
+			if (gender == Gender.Male)
+				rarityKey += "Male";
+
+			var nameKey = Utils.GetObjectDisplayTerm(FoodItem, 0);
+			var primaryIngredientKey =
+				PlayerController.GetAnyObjectIDReplaceForNameAndDesc(PrimaryIngredient).ToString();
+			var secondaryIngredientKey =
+				PlayerController.GetAnyObjectIDReplaceForNameAndDesc(SecondaryIngredient).ToString();
+
+			if (primaryIngredientKey.EndsWith("Rare"))
+				primaryIngredientKey = primaryIngredientKey.Remove(primaryIngredientKey.Length - 4, 4);
+			if (secondaryIngredientKey.EndsWith("Rare"))
+				secondaryIngredientKey = secondaryIngredientKey.Remove(secondaryIngredientKey.Length - 4, 4);
+			if (nameKey.EndsWith("Rare") || nameKey.EndsWith("Epic"))
+				nameKey = nameKey.Remove(nameKey.Length - 4, 4);
+			
+			var name = string.Format(Utils.GetTranslation("foodFormat", language),
+				Utils.GetTranslation("FoodAdjectives/" + secondaryIngredientKey, language),
+				Utils.GetTranslation("FoodNouns/" + primaryIngredientKey, language),
+				Utils.GetTranslation("Items/" + nameKey, language)
+			);
+
+			if (!string.IsNullOrEmpty(rarityKey))
+				name = string.Format(Utils.GetTranslation("rareItemFormat", language), Utils.GetTranslation(rarityKey, language), name);
+
+			return name;
+		}
 	}
 }

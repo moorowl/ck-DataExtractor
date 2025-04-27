@@ -10,7 +10,7 @@ namespace DataExtractor.Extractors {
 		public override JToken Extract() {
 			var data = LocalizationManager.GetTermsList()
 				.OrderBy(term => term)
-				.ToDictionary(term => term, Utils.GetText);
+				.ToDictionary(term => term, Utils.GetTranslations);
 
 			return Serialize(data);
 		}

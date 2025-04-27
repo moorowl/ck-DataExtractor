@@ -13,8 +13,8 @@ namespace DataExtractor.Extractors {
 			var data = creditsData.creditsElements.Select(element => {
 				return new {
 					Layout = element.layout,
-					Title = element.skipTitle ? null : Utils.GetText(CreditsData.TitleToTerm(element.title)),
-					Names = element.creditNames.Select(name => Utils.GetText($"CreditsNames/{name}")),
+					Title = element.skipTitle ? null : Utils.GetTranslations(CreditsData.TitleToTerm(element.title)),
+					Names = element.creditNames.Select(name => Utils.GetTranslations($"CreditsNames/{name}")),
 					UseCommaSeparationForNames = element.useCommaSeparationForNames,
 					EndWithComma = element.endWithComma,
 				};

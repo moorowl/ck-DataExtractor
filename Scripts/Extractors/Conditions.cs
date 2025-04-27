@@ -36,11 +36,14 @@ namespace DataExtractor.Extractors {
 				var effect = condition.effect;
 
 				var idForDescription = (condition.useSameDescAsId != 0) ? condition.useSameDescAsId : id;
-				var description = Utils.GetText("Conditions/" + idForDescription);
-				var descriptionIsAPercentage = IsDescriptionPercentage(description);
+				var description = Utils.GetTranslations("Conditions/" + idForDescription);
+				var englishDescription = Utils.GetTranslation("Conditions/" + idForDescription, "English");
+				var descriptionIsAPercentage = IsDescriptionPercentage(englishDescription);
 
-				var descriptionForSetBonus = IsUsedBySetBonus.Value.Contains(id) ? Utils.GetText("Conditions/" + id) : null;
-				if (descriptionForSetBonus == description)
+				var descriptionForSetBonus = IsUsedBySetBonus.Value.Contains(id) ? Utils.GetTranslations("Conditions/" + id) : null;
+				var englishDescriptionForSetBonus = IsUsedBySetBonus.Value.Contains(id) ? Utils.GetTranslation("Conditions/" + id, "English") : null;
+				
+				if (englishDescriptionForSetBonus == englishDescription)
 					descriptionForSetBonus = null;
 
 				return new {

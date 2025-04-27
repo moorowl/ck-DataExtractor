@@ -17,8 +17,8 @@ namespace DataExtractor.Extractors {
 				return new {
 					Id = (int) role,
 					InternalName = role,
-					DisplayName = Utils.GetText($"Roles/{role}"),
-					Description = Utils.GetText($"Roles/{role}Desc"),
+					DisplayName = Utils.GetTranslations($"Roles/{role}"),
+					Description = Utils.GetTranslations($"Roles/{role}Desc"),
 					StarterSkill = starterSkill,
 					StarterItems = perks.starterItems.Select(item => new {
 						Id = item.objectID,

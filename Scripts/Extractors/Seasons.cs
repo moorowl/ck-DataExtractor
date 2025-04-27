@@ -16,7 +16,7 @@ namespace DataExtractor.Extractors {
 				return new {
 					Id = (int) id,
 					InternalName = id,
-					DisplayName = Utils.GetText("Seasons/" + id),
+					DisplayName = Utils.GetTranslations("Seasons/" + id),
 					Date = new {
 						StartDay = defaultDate.startDay,
 						StartMonth = defaultDate.startMonth,

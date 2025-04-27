@@ -8,17 +8,44 @@ using UnityEngine;
 
 namespace DataExtractor.Utilities {
 	public static class Utils {
-		public static string GetText(string term) {
-			return LocalizationManager.GetTranslation(term, overrideLanguage: "English");
+		public static string GetTranslation(string term, string language) {
+			return LocalizationManager.GetTranslation(term, overrideLanguage: language);
+		}
+		
+		public static Dictionary<string, string> GetTranslations(string term) {
+			var translations = LocalizationManager.GetAllLanguages()
+				.Select(language => (LocalizationManager.GetLanguageCode(language), GetTranslation(term, language)))
+				.Where(tuple => tuple.Item2 != null)
+				.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+			
+			return translations.Any() ? translations : null;
 		}
 
-		public static string GetObjectName(ObjectID id, int variation) {
+		public static string GetObjectName(ObjectID id, int variation, string language) {
 			var term = GetObjectDisplayTerm(id, variation);
-			return GetText($"Items/{term}") ?? GetText($"Names/{term}");
+			return GetTranslation($"Items/{term}", language) ?? GetTranslation($"Names/{term}", language);
+		}
+		
+		public static Dictionary<string, string> GetObjectNames(ObjectID id, int variation) {
+			var objectNames = LocalizationManager.GetAllLanguages()
+				.Select(language => (LocalizationManager.GetLanguageCode(language), GetObjectName(id, variation, language)))
+				.Where(tuple => tuple.Item2 != null)
+				.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+			
+			return objectNames.Any() ? objectNames : null;
 		}
 
-		public static string GetObjectDescription(ObjectID id, int variation) {
-			return GetText($"Items/{GetObjectDisplayTerm(id, variation)}Desc");
+		public static string GetObjectDescription(ObjectID id, int variation, string language) {
+			return GetTranslation($"Items/{GetObjectDisplayTerm(id, variation)}Desc", language);
+		}
+		
+		public static Dictionary<string, string> GetObjectDescriptions(ObjectID id, int variation) {
+			var objectDescriptions = LocalizationManager.GetAllLanguages()
+				.Select(language => (LocalizationManager.GetLanguageCode(language), GetObjectDescription(id, variation, language)))
+				.Where(tuple => tuple.Item2 != null)
+				.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+			
+			return objectDescriptions.Any() ? objectDescriptions : null;
 		}
 
 		public static string GetObjectDisplayTerm(ObjectID id, int variation) {

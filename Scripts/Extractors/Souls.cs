@@ -22,8 +22,8 @@ namespace DataExtractor.Extractors {
 				return new {
 					Id = (int) soul,
 					InternalName = soul,
-					DisplayName = uiElement != null ? Utils.GetText(uiElement.soulTitle.mTerm) : null,
-					Description = uiElement != null ? Utils.GetText(uiElement.soulDesc.mTerm) : null,
+					DisplayName = uiElement != null ? Utils.GetTranslations(uiElement.soulTitle.mTerm) : null,
+					Description = uiElement != null ? Utils.GetTranslations(uiElement.soulDesc.mTerm) : null,
 					Condition = hasCondition ? new { Id = condition.conditionID, Value = condition.value } : null
 				};
 			});

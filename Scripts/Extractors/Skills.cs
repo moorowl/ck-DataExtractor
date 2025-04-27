@@ -24,8 +24,8 @@ namespace DataExtractor.Extractors {
 				return new {
 					Id = (int) id,
 					InternalName = id,
-					DisplayName = Utils.GetText($"Skills/{id}"),
-					Description = Utils.GetText($"Skills/{id}Desc"),
+					DisplayName = Utils.GetTranslations($"Skills/{id}"),
+					Description = Utils.GetTranslations($"Skills/{id}Desc"),
 					Icon = iconSet.icon?.name,
 					goldIcon = iconSet.goldIcon?.name,
 					IconColor = Manager.ui.GetSkillColor(id).ToHex(),
@@ -36,7 +36,7 @@ namespace DataExtractor.Extractors {
 					MaxLevel = SkillExtensions.GetMaxSkillLevel(id),
 					Talents = info.skillTalents.Select(talent => new {
 						InternalName = talent.name,
-						DisplayName = Utils.GetText($"SkillTalents/{talent.name}"),
+						DisplayName = Utils.GetTranslations($"SkillTalents/{talent.name}"),
 						Condition = talent.givesCondition,
 						ConditionValuePerPoint = talent.conditionValuePerPoint,
 						Icon = talent.icon?.name
