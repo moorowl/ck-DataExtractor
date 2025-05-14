@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using Pug.UnityExtensions;
 
 namespace DataExtractor.DataStructures.Converters {
 	public class DirectionConverter : JsonConverter {

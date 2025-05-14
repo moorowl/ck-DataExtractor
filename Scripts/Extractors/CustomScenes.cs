@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using PugTilemap;
 using System.Collections.Generic;
 using System.Linq;
+using Pug.UnityExtensions;
 using Unity.Mathematics;
 using UnityEngine;
 using static CustomScenesDataTable;
