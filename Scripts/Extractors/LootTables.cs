@@ -8,7 +8,7 @@ namespace DataExtractor.Extractors {
 		public override JToken Extract() {
 			var lootTables = Manager.mod.LootTable.OrderBy(lootTable => (int) lootTable.id);
 
-			var data = lootTables.Select(lootTable => {
+			var data = lootTables.GroupBy(lootTable => lootTable.id).Select(group => group.First()).Select(lootTable => {
 				var id = lootTable.id;
 
 				return new {
