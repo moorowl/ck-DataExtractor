@@ -33,7 +33,10 @@ namespace DataExtractor.Extractors {
 						Spawns = spawnObject.spawns.Select(spawn => new {
 							SpawnType = spawn.spawnType,
 							Id = spawn.objectID,
-							Variation = spawn.variation,
+							Variation = (object) (!spawn.advancedVariationControl ? spawn.variation : spawn.weightedVariations.value.Select(weightedVariation => new {
+								Variation = weightedVariation.value,
+								Weight = weightedVariation.weight
+							})),
 							Amount = spawn.amount,
 							ClusterSpawnChance = spawn.spawnType == EnvironmentSpawnType.Cluster
 								? spawn.clusterSpawnChance
@@ -72,7 +75,10 @@ namespace DataExtractor.Extractors {
 						Spawns = respawnObject.spawns.Select(spawn => new {
 							SpawnType = spawn.spawnType,
 							Id = spawn.objectID,
-							Variation = spawn.variation,
+							Variation = (object) (!spawn.advancedVariationControl ? spawn.variation : spawn.weightedVariations.value.Select(weightedVariation => new {
+								Variation = weightedVariation.value,
+								Weight = weightedVariation.weight
+							})),
 							Amount = spawn.amount,
 							ClusterSpawnChance = spawn.spawnType == EnvironmentSpawnType.Cluster
 								? spawn.clusterSpawnChance
