@@ -9,7 +9,7 @@ using UnityEngine;
 namespace DataExtractor.Utilities {
 	public static class Utils {
 		public static string GetTranslation(string term, string language) {
-			return LocalizationManager.GetTranslation(term, overrideLanguage: language);
+			return LocalizationManager.GetTranslation(term, overrideLanguage: language)?.Replace("\r", "");
 		}
 		
 		public static Dictionary<string, string> GetTranslations(string term) {
@@ -103,26 +103,33 @@ namespace DataExtractor.Utilities {
 
 		private static readonly Lazy<Dictionary<int, string>> ScenePrefabNames = new(() => {
 			var scenesDataTable = Resources.Load<CustomScenesDataTable>("Scenes/CustomScenesDataTable");
-			var allPrefabs = scenesDataTable.scenes.SelectMany(scene => scene.prefabs)
-				.GroupBy(prefab => prefab.GetInstanceID())
-				.Select(group => group.First())
-				.OrderByDescending(prefab => prefab.GetInstanceID());
+			var allPrefabs = new List<(GameObject Prefab, string Scene, int IndexInScene)>();
+
+			foreach (var scene in scenesDataTable.scenes) {
+				for (var i = 0; i < scene.prefabs.Count; i++) {
+					var prefab = scene.prefabs[i];
+					allPrefabs.Add((prefab, scene.sceneName, i));
+				}
+			}
+			allPrefabs.Sort((x, y) => x.Prefab.GetInstanceID().CompareTo(y.Prefab.GetInstanceID()));
 
 			var uniqueNameToPrefab = new Dictionary<string, GameObject>();
 
 			foreach (var prefab in allPrefabs) {
-				var name = prefab.name;
+				var baseName = prefab.Prefab.name.Replace($"_{prefab.IndexInScene}", "") + "_" + prefab.Scene;
 				var index = 0;
+				var name = $"{baseName}_{index}";
+				index++;
 
 				while (uniqueNameToPrefab.ContainsKey(name)) {
-					name = $"{prefab.name}_{index}";
+					name = $"{baseName}_{index}";
 					index++;
 				}
 
-				uniqueNameToPrefab[name] = prefab;
+				uniqueNameToPrefab[name] = prefab.Prefab;
 			}
 
-			return uniqueNameToPrefab.ToDictionary(x => x.Value.GetInstanceID(), x => x.Key);
+			return uniqueNameToPrefab.GroupBy(x => x.Value.GetInstanceID()).Select(group => group.First()).ToDictionary(x => x.Value.GetInstanceID(), x => x.Key);
 		});
 
 		public static string GetUniqueScenePrefabName(GameObject prefab) {
