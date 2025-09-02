@@ -54,6 +54,7 @@ namespace DataExtractor.Extractors {
 							var hasUpgradedConditionsAuthoring = GetEquippedConditionsUpgrade(data, level, out var upgradedConditions);
 							var hasUpgradedExplosivesAuthoring = GetExplosiveUpgrade(data, level, out var upgradedExplosiveDamage, out var upgradedMiningDamage);
 							var hasUpgradedManaCostAuthoring = GetManaCostUpgrade(data, level, out var upgradedManaCost);
+							var hasUpgradedExtraInventorySizeAuthoring = GetInventorySizeUpgrade(data, level, out var upgradedInventorySize);
 
 							if (!hasUpgradedWeaponDamageAuthoring && !hasUpgradedConditionsAuthoring && !hasUpgradedExplosivesAuthoring)
 								continue;
@@ -82,6 +83,12 @@ namespace DataExtractor.Extractors {
 							if (hasUpgradedManaCostAuthoring) {
 								components[nameof(ConsumesManaAuthoring)] = new {
 									manaCost = upgradedManaCost
+								};
+							}
+
+							if (hasUpgradedExtraInventorySizeAuthoring) {
+								components[nameof(ExtraInventorySizeAuthoring)] = new {
+									value = upgradedInventorySize
 								};
 							}
 
@@ -221,6 +228,17 @@ namespace DataExtractor.Extractors {
 				return false;
 
 			upgradedManaCost = manaAuthoring.ComputeManaCostFromLevel(level);
+
+			return true;
+		}
+		
+		private static bool GetInventorySizeUpgrade(ObjectDataFromPrefab data, int level, out int upgradedInventorySize) {
+			upgradedInventorySize = 0;
+			
+			if (!data.TryGetComponent<ExtraInventorySizeAuthoring>(out var extraInventorySizeAuthoring) || extraInventorySizeAuthoring.sameSizeForAllLevels.hasValue)
+				return false;
+
+			upgradedInventorySize = ExtraInventorySizeAuthoring.GetSizeFromLevel(level);
 
 			return true;
 		}
