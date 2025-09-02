@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using Pug.UnityExtensions;
 using PugMod;
@@ -43,8 +44,9 @@ namespace DataExtractor.Extractors {
 						InternalName = group.tableName,
 						BiomeToSpawnIn = group.biome,
 						MinDistanceFromCoreInClassicWorlds = group.minDistanceFromCoreInClassicWorlds,
+						AnyDungeonSpawnChance = group.anyDungeonSpawnChance,
 						SpawnEntries = group.spawnEntries.Select(spawnEntry => new {
-							SpawnChance = spawnEntry.spawnChance,
+							SpawnWeight = spawnEntry.spawnWeight,
 							Dungeon = MapDungeon(spawnEntry.prefab)
 						})
 					};
@@ -63,6 +65,7 @@ namespace DataExtractor.Extractors {
 			var dungeonPathAuthoring = gameObject.GetComponent<DungeonPathAuthoring>();
 			var dungeonSpawnTemplateAuthoring = gameObject.GetComponent<DungeonSpawnTemplateAuthoring>();
 			var dungeonCustomScenesAuthoring = gameObject.GetComponent<DungeonCustomScenesAuthoring>();
+			var dungeonReplaceObjectsAuthoring = gameObject.GetComponent<DungeonReplaceObjectsAuthoring>();
 
 			return new {
 				InternalName = gameObject.name,
@@ -120,7 +123,26 @@ namespace DataExtractor.Extractors {
 					NumberToSpawn = group.numberToSpawn,
 					Scenes = group.scenes.Select(scene => SceneReferenceToName(scene.scene)),
 				}),
-				CustomScene = dungeonSingleCustomSceneAuthoring != null ? SceneReferenceToName(dungeonSingleCustomSceneAuthoring.scene) : null
+				CustomScene = dungeonSingleCustomSceneAuthoring != null ? SceneReferenceToName(dungeonSingleCustomSceneAuthoring.scene) : null,
+				ObjectReplacements = dungeonReplaceObjectsAuthoring?.replacements?.Select(replacement => {
+					var variations = new List<ValueWithWeight<int>>();
+
+					if (replacement.advancedVariationControl) {
+						variations.AddRange(replacement.weightedVariations.value);
+					} else {
+						for (var i = replacement.variation.min; i <= replacement.variation.max; i++)
+							variations.Add(new ValueWithWeight<int>(i, 1f));
+					}
+					
+					return new {
+						SourceId = replacement.replaceID,
+						TargetId = replacement.replaceID,
+						TargetVariation = variations.Select(variation => new {
+							Variation = variation.value,
+							Weight = variation.weight
+						})
+					};
+				})
 			};
 		}
 
@@ -140,26 +162,40 @@ namespace DataExtractor.Extractors {
 				InternalName = template.name,
 				ShapeAmplitude = template.shapeAmplitude,
 				ShapeFrequency = template.shapeFrequency,
-				SpawnEntries = template.spawnEntries?.Select(spawnEntry => new {
-					ObjectId = spawnEntry.objectID,
-					ObjectAmount = spawnEntry.objectAmount,
-					ObjectVariation = spawnEntry.variation,
-					ChanceToAppear = spawnEntry.chanceToAppearAtAll,
-					CanSpawnOn = spawnEntry.canSpawnOn,
-					CanSpawnNextTo = spawnEntry.canSpawnNextTo,
-					CannotSpawnOnAnyPreviousObject = spawnEntry.cannotSpawnOnAnyPreviousObject,
-					CannotSpawnOn = spawnEntry.canNotSpawnOn,
-					ContainLoot = spawnEntry.containLoot,
-					Algorithm = spawnEntry.algorithm,
-					PlacementAlignment = spawnEntry.placementAlignement,
-					RandomPlacement = spawnEntry.randomPlacement,
-					RandomChance = spawnEntry.randomChance,
-					ShapeSize = spawnEntry.shapeSize,
-					Amount = spawnEntry.amount,
-					PlacementRadius = spawnEntry.placementRadius,
-					RotateTowardsCenter = spawnEntry.rotateTowardsCenter,
-					Tilt = spawnEntry.tilt,
-					Oblongness = spawnEntry.oblongness
+				SpawnEntries = template.spawnEntries?.Select(spawnEntry => {
+					var variations = new List<ValueWithWeight<int>>();
+
+					if (spawnEntry.advancedVariationControl) {
+						variations.AddRange(spawnEntry.weightedVariations);
+					} else {
+						for (var i = spawnEntry.variation.min; i <= spawnEntry.variation.max; i++)
+							variations.Add(new ValueWithWeight<int>(i, 1f));
+					}
+					
+					return new {
+						ObjectId = spawnEntry.objectID,
+						ObjectAmount = spawnEntry.objectAmount,
+						ObjectVariation = variations.Select(variation => new {
+							Variation = variation.value,
+							Weight = variation.weight
+						}),
+						ChanceToAppear = spawnEntry.chanceToAppearAtAll,
+						CanSpawnOn = spawnEntry.canSpawnOn,
+						CanSpawnNextTo = spawnEntry.canSpawnNextTo,
+						CannotSpawnOnAnyPreviousObject = spawnEntry.cannotSpawnOnAnyPreviousObject,
+						CannotSpawnOn = spawnEntry.canNotSpawnOn,
+						ContainLoot = spawnEntry.containLoot,
+						Algorithm = spawnEntry.algorithm,
+						PlacementAlignment = spawnEntry.placementAlignement,
+						RandomPlacement = spawnEntry.randomPlacement,
+						RandomChance = spawnEntry.randomChance,
+						ShapeSize = spawnEntry.shapeSize,
+						Amount = spawnEntry.amount,
+						PlacementRadius = spawnEntry.placementRadius,
+						RotateTowardsCenter = spawnEntry.rotateTowardsCenter,
+						Tilt = spawnEntry.tilt,
+						Oblongness = spawnEntry.oblongness
+					};
 				}),
 			};
 		}

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using PugTilemap;
 using System.Linq;
 
@@ -30,23 +31,33 @@ namespace DataExtractor.Extractors {
 							CanSpawnInBlockedArea = spawnCheck.canSpawnInBlockedArea,
 							SkipSpawnForPartialMaps = spawnCheck.skipSpawnForPartialMaps
 						},
-						Spawns = spawnObject.spawns.Select(spawn => new {
-							SpawnType = spawn.spawnType,
-							Id = spawn.objectID,
-							Variation = (object) (!spawn.advancedVariationControl ? spawn.variation : spawn.weightedVariations.value.Select(weightedVariation => new {
-								Variation = weightedVariation.value,
-								Weight = weightedVariation.weight
-							})),
-							Amount = spawn.amount,
-							ClusterSpawnChance = spawn.spawnType == EnvironmentSpawnType.Cluster
-								? spawn.clusterSpawnChance
-								: (float?) null,
-							ClusterSpreadChance = spawn.spawnType == EnvironmentSpawnType.Cluster
-								? spawn.clusterSpreadChance
-								: (float?) null,
-							ClusterSpreadFourWayOnly = spawn.spawnType == EnvironmentSpawnType.Cluster
-								? spawn.clusterSpreadFourWayOnly
-								: (bool?) null
+						Spawns = spawnObject.spawns.Select(spawn => {
+							var variations = new List<ValueWithWeight<int>>();
+							if (spawn.advancedVariationControl) {
+								variations.AddRange(spawn.weightedVariations.value);
+							} else {
+								for (var i = spawn.variation.min; i <= spawn.variation.max; i++)
+									variations.Add(new ValueWithWeight<int>(i, 1f));
+							}
+							
+							return new {
+								SpawnType = spawn.spawnType,
+								Id = spawn.objectID,
+								Variation = variations.Select(variation => new {
+									Variation = variation.value,
+									Weight = variation.weight
+								}),
+								Amount = spawn.amount,
+								ClusterSpawnChance = spawn.spawnType == EnvironmentSpawnType.Cluster
+									? spawn.clusterSpawnChance
+									: (float?) null,
+								ClusterSpreadChance = spawn.spawnType == EnvironmentSpawnType.Cluster
+									? spawn.clusterSpreadChance
+									: (float?) null,
+								ClusterSpreadFourWayOnly = spawn.spawnType == EnvironmentSpawnType.Cluster
+									? spawn.clusterSpreadFourWayOnly
+									: (bool?) null
+							};
 						}),
 					};
 				}),
@@ -72,23 +83,33 @@ namespace DataExtractor.Extractors {
 								Tileset = adjacentTile.mustAlsoMatchTileset ? adjacentTile.tileset : (Tileset?) null
 							})
 						},
-						Spawns = respawnObject.spawns.Select(spawn => new {
-							SpawnType = spawn.spawnType,
-							Id = spawn.objectID,
-							Variation = (object) (!spawn.advancedVariationControl ? spawn.variation : spawn.weightedVariations.value.Select(weightedVariation => new {
-								Variation = weightedVariation.value,
-								Weight = weightedVariation.weight
-							})),
-							Amount = spawn.amount,
-							ClusterSpawnChance = spawn.spawnType == EnvironmentSpawnType.Cluster
-								? spawn.clusterSpawnChance
-								: (float?) null,
-							ClusterSpreadChance = spawn.spawnType == EnvironmentSpawnType.Cluster
-								? spawn.clusterSpreadChance
-								: (float?) null,
-							ClusterSpreadFourWayOnly = spawn.spawnType == EnvironmentSpawnType.Cluster
-								? spawn.clusterSpreadFourWayOnly
-								: (bool?) null
+						Spawns = respawnObject.spawns.Select(spawn => {
+							var variations = new List<ValueWithWeight<int>>();
+							if (spawn.advancedVariationControl) {
+								variations.AddRange(spawn.weightedVariations.value);
+							} else {
+								for (var i = spawn.variation.min; i <= spawn.variation.max; i++)
+									variations.Add(new ValueWithWeight<int>(i, 1f));
+							}
+							
+							return new {
+								SpawnType = spawn.spawnType,
+								Id = spawn.objectID,
+								Variation = variations.Select(variation => new {
+									Variation = variation.value,
+									Weight = variation.weight
+								}),
+								Amount = spawn.amount,
+								ClusterSpawnChance = spawn.spawnType == EnvironmentSpawnType.Cluster
+									? spawn.clusterSpawnChance
+									: (float?) null,
+								ClusterSpreadChance = spawn.spawnType == EnvironmentSpawnType.Cluster
+									? spawn.clusterSpreadChance
+									: (float?) null,
+								ClusterSpreadFourWayOnly = spawn.spawnType == EnvironmentSpawnType.Cluster
+									? spawn.clusterSpreadFourWayOnly
+									: (bool?) null
+							};
 						})
 					};
 				})
