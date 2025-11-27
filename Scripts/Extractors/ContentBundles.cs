@@ -17,6 +17,8 @@ namespace DataExtractor.Extractors {
 					DisplayName = Utils.GetTranslations($"Menu/ContentBundle{contentBundle.id}Title"),
 					Description = Utils.GetTranslations($"Menu/ContentBundle{contentBundle.id}Desc"),
 					CanBeActivatedByPlayer = contentBundle.canBeActivatedByPlayer,
+					AutomaticallyAddedToNewWorlds = contentBundle.automaticallyAddedToNewWorlds,
+					AnabledIfSeedContainsString = contentBundle.enabledIfSeedContainsString.hasValue ? contentBundle.enabledIfSeedContainsString.value : null,
 					Dependencies = contentBundle.dependencies
 				});
 
